@@ -1,0 +1,14 @@
+node_modules
+dist
+dist-ssr
+*.local
+
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+blog-admin/node_modules
+blog-admin/dist
