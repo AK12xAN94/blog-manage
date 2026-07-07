@@ -50,9 +50,9 @@ const generateToken = (): string => {
 const useUserLoginStore = create<UserLoginState>()(
   persist(
     (set, get) => ({
-      userInfo: null,
-      token: null,
-      isLoggedIn: false,
+      userInfo: null, // 用户信息
+      token: null,  // 登录凭证
+      isLoggedIn: false, // 是否登录
 
       login: async (params: LoginParams) => {
         await new Promise((resolve) => setTimeout(resolve, 500))

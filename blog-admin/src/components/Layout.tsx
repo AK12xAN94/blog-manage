@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Layout, Menu, Avatar, Dropdown } from 'antd'
+import '../pages/home/index.css'
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -8,39 +9,35 @@ import {
   FileTextOutlined,
   LogoutOutlined,
 } from '@ant-design/icons'
-import { useNavigate } from 'react-router-dom'
-import useUserLoginStore from '../../store/useLoginStore'
-import './index.css'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
+import useUserLoginStore from '../store/useLoginStore'
 
 const { Header, Sider, Content, Footer } = Layout
 
 const menuItems = [
-  { key: '1', label: '首页', icon: <HomeOutlined /> },
-  { key: '2', label: '用户管理', icon: <UserOutlined /> },
-  { key: '3', label: '博客管理', icon: <FileTextOutlined /> },
+  { key: '/', label: '首页', icon: <HomeOutlined /> },
+  { key: '/users', label: '用户管理', icon: <UserOutlined /> },
+  { key: '/blogs', label: '博客管理', icon: <FileTextOutlined /> },
 ]
+
+const getSelectedKey = (pathname: string): string => {
+  return menuItems.find(item =>
+    pathname === item.key || pathname.startsWith(item.key + '/')
+  )?.key || '/'
+}
 
 const userMenuItems = [
   { key: 'logout', label: '退出登录', icon: <LogoutOutlined /> },
 ]
 
-export default function Home() {
+export default function AppLayout() {
   const [collapsed, setCollapsed] = useState(false)
   const navigate = useNavigate()
+  const location = useLocation()
   const { logout, userInfo } = useUserLoginStore()
 
   const handleMenuClick = ({ key }: { key: string }) => {
-    switch (key) {
-      case '1':
-        navigate('/')
-        break
-      case '2':
-        navigate('/users')
-        break
-      case '3':
-        navigate('/blogs')
-        break
-    }
+    navigate(key)
   }
 
   const handleUserMenuClick = ({ key }: { key: string }) => {
@@ -48,6 +45,8 @@ export default function Home() {
       logout()
     }
   }
+
+  const selectedKey = getSelectedKey(location.pathname)
 
   return (
     <Layout className="home-layout">
@@ -63,7 +62,7 @@ export default function Home() {
         </div>
         <Menu
           mode="inline"
-          defaultSelectedKeys={['1']}
+          selectedKeys={[selectedKey]}
           items={menuItems}
           onClick={handleMenuClick}
         />
@@ -89,30 +88,7 @@ export default function Home() {
           </div>
         </Header>
         <Content className="home-content">
-          <div className="welcome-section">
-            <h2 className="welcome-title">欢迎来到知否在线博客论坛</h2>
-            <div className="hero-card">
-              <div className="hero-content">
-                <h1 className="hero-title">知否技术</h1>
-                <p className="hero-subtitle">让技术更简单</p>
-                <div className="search-bar">
-                  <input type="text" placeholder="搜索文章..." />
-                  <button className="search-btn">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <circle cx="11" cy="11" r="8"></circle>
-                      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                    </svg>
-                  </button>
-                </div>
-              </div>
-              <div className="hero-image">
-                <img
-                  src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=two%20cartoon%20students%20studying%20at%20desk%20with%20books%20minimal%20style%20purple%20background&image_size=landscape_4_3"
-                  alt="Welcome"
-                />
-              </div>
-            </div>
-          </div>
+          <Outlet />
         </Content>
         <Footer className="home-footer">
           知否技术 ©2024 Created by 知否技术
