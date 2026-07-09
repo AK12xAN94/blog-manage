@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { Table, Button, Input, Select, Space, Tag, message, Popconfirm, Spin } from 'antd'
+import { Table, Button, Input, Select, Space, Tag, message, Popconfirm, Spin, ConfigProvider } from 'antd'
 import { PlusOutlined, EyeOutlined, EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons'
 import type { TableProps } from 'antd'
+import zhCN from 'antd/es/locale/zh_CN'
 import type { BlogInfo } from '../../api/BlogApi'
 import BlogForm from '../../components/BlogForm'
 import BlogDetailModal from '../../components/BlogDetailModal'
@@ -25,6 +26,35 @@ const statusMap: Record<number, { label: string; color: string }> = {
 
 const formatDate = (dateStr: string) => {
   return new Date(dateStr).toLocaleDateString('zh-CN')
+}
+
+const filterBlogData = (
+  data: BlogInfo[],
+  searchParams: { title: string; category: string | undefined; status: number | undefined },
+  pagination: { current: number; pageSize: number }
+) => {
+  let filteredData = [...data]
+
+  if (searchParams.title) {
+    filteredData = filteredData.filter((blog) =>
+      blog.title.toLowerCase().includes(searchParams.title.toLowerCase())
+    )
+  }
+
+  if (searchParams.category) {
+    filteredData = filteredData.filter((blog) => blog.category === searchParams.category)
+  }
+
+  if (searchParams.status !== undefined) {
+    filteredData = filteredData.filter((blog) => blog.status === searchParams.status)
+  }
+
+  const total = filteredData.length
+  const start = (pagination.current - 1) * pagination.pageSize
+  const end = start + pagination.pageSize
+  const paginatedData = filteredData.slice(start, end)
+
+  return { data: paginatedData, total }
 }
 
 const mockBlogs: BlogInfo[] = [
@@ -217,7 +247,9 @@ export default function Blogs() {
       if (index !== -1) {
         mockBlogs.splice(index, 1)
         message.success('删除成功')
-        fetchData()
+        const result = filterBlogData(mockBlogs, searchParams, pagination)
+        setData(result.data)
+        setTotal(result.total)
       } else {
         message.error('博客不存在')
       }
@@ -271,7 +303,6 @@ export default function Blogs() {
       key: 'viewCount',
       width: 80,
       sorter: (a: BlogInfo, b: BlogInfo) => a.viewCount - b.viewCount,
-      sortOrder: 'descend',
     },
     {
       title: '状态',
@@ -325,42 +356,22 @@ export default function Blogs() {
     },
   ]
 
-  const fetchData = async () => {
-    setLoading(true)
-    try {
-      let filteredData = [...mockBlogs]
-
-      if (searchParams.title) {
-        filteredData = filteredData.filter((blog) =>
-          blog.title.toLowerCase().includes(searchParams.title.toLowerCase())
-        )
-      }
-
-      if (searchParams.category) {
-        filteredData = filteredData.filter((blog) => blog.category === searchParams.category)
-      }
-
-      if (searchParams.status !== undefined) {
-        filteredData = filteredData.filter((blog) => blog.status === searchParams.status)
-      }
-
-      const total = filteredData.length
-      const start = (pagination.current - 1) * pagination.pageSize
-      const end = start + pagination.pageSize
-      const paginatedData = filteredData.slice(start, end)
-
-      setData(paginatedData)
-      setTotal(total)
-    } catch {
-      message.error('获取数据失败，请稍后重试')
-    } finally {
-      setLoading(false)
-    }
-  }
-
   useEffect(() => {
-    fetchData()
-  }, [pagination, searchParams])
+    const loadData = async () => {
+      setLoading(true)
+      try {
+        const result = filterBlogData(mockBlogs, searchParams, pagination)
+        setData(result.data)
+        setTotal(result.total)
+      } catch {
+        message.error('获取数据失败，请稍后重试')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadData()
+  }, [searchParams, pagination])
 
   const handleTableChange: TableProps<BlogInfo>['onChange'] = (paginationInfo) => {
     setPagination({
@@ -391,7 +402,9 @@ export default function Blogs() {
 
   const handleFormSuccess = () => {
     setFormVisible(false)
-    fetchData()
+    const result = filterBlogData(mockBlogs, searchParams, pagination)
+    setData(result.data)
+    setTotal(result.total)
   }
 
   const handleEditFromDetail = (data: BlogInfo) => {
@@ -446,6 +459,7 @@ export default function Blogs() {
       </div>
 
       <Spin spinning={loading}>
+        <ConfigProvider locale={zhCN}>
         <Table
           columns={columns}
           dataSource={data}
@@ -462,6 +476,7 @@ export default function Blogs() {
           onChange={handleTableChange}
           scroll={{ x: 1000 }}
         />
+        </ConfigProvider>
       </Spin>
 
       <BlogForm
