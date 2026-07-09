@@ -2,6 +2,7 @@
 import { lazy } from 'react'
 import type { RouteObject } from 'react-router-dom'
 import Login from '../pages/Login'
+import NotFound from '../pages/NotFound'
 import AppLayout from '../components/Layout'
 import ProtectedRoute from '../components/ProtectedRoute'
 import SuspenseWrapper from '../components/SuspenseWrapper'
@@ -47,7 +48,15 @@ const routes: RouteObject[] = [
           </SuspenseWrapper>
         ),
       },
+      {
+        path: '/*',
+        element: <NotFound />,
+      },
     ],
+  },
+  {
+    path: '*',
+    element: <NotFound />,
   },
 ]
 
