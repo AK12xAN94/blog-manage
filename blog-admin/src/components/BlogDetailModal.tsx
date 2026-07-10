@@ -1,6 +1,8 @@
 import { Modal, Button, Tag, Descriptions, Image } from 'antd'
 import { EditOutlined, ArrowLeftOutlined } from '@ant-design/icons'
 import type { BlogInfo } from '../api/BlogApi'
+import { statusMap } from '../utils/constants'
+import { formatDateTime } from '../utils/format'
 
 interface BlogDetailModalProps {
   visible: boolean
@@ -9,23 +11,8 @@ interface BlogDetailModalProps {
   data: BlogInfo | null
 }
 
-const statusMap: Record<number, { label: string; color: string }> = {
-  0: { label: '草稿', color: 'default' },
-  1: { label: '已发布', color: 'success' },
-}
-
 export default function BlogDetailModal({ visible, onCancel, onEdit, data }: BlogDetailModalProps) {
   if (!data) return null
-
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleString('zh-CN', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-    })
-  }
 
   return (
     <Modal
@@ -72,8 +59,8 @@ export default function BlogDetailModal({ visible, onCancel, onEdit, data }: Blo
         <Descriptions.Item label="阅读量">{data.viewCount}</Descriptions.Item>
         <Descriptions.Item label="点赞数">{data.likeCount}</Descriptions.Item>
         <Descriptions.Item label="评论数">{data.commentCount}</Descriptions.Item>
-        <Descriptions.Item label="创建时间">{formatDate(data.createdAt)}</Descriptions.Item>
-        <Descriptions.Item label="更新时间">{formatDate(data.updatedAt)}</Descriptions.Item>
+        <Descriptions.Item label="创建时间">{formatDateTime(data.createdAt)}</Descriptions.Item>
+        <Descriptions.Item label="更新时间">{formatDateTime(data.updatedAt)}</Descriptions.Item>
       </Descriptions>
 
       <div style={{ textAlign: 'right' }}>

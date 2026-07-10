@@ -3,6 +3,7 @@ import { Form, Input, Select, Button, Upload, Modal, message } from 'antd'
 import { UploadOutlined, CloseOutlined } from '@ant-design/icons'
 import type { BlogInfo } from '../api/BlogApi'
 import { saveBlog } from '../api/BlogApi'
+import { categories } from '../utils/constants'
 
 interface BlogFormProps {
   visible: boolean
@@ -13,15 +14,6 @@ interface BlogFormProps {
 
 const { TextArea } = Input
 const { Option } = Select
-
-const categories = [
-  { value: 'java', label: 'Java' },
-  { value: 'vue', label: 'Vue' },
-  { value: 'react', label: 'React' },
-  { value: 'node', label: 'Node.js' },
-  { value: 'database', label: '数据库' },
-  { value: 'other', label: '其他' },
-]
 
 export default function BlogForm({ visible, onCancel, onSuccess, editData }: BlogFormProps) {
   const [form] = Form.useForm()

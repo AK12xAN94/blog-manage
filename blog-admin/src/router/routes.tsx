@@ -9,6 +9,7 @@ import SuspenseWrapper from '../components/SuspenseWrapper'
 
 const HomeContent = lazy(() => import('../pages/HomeContent'))
 const Blogs = lazy(() => import('../pages/blogs'))
+const BlogDetail = lazy(() => import('../pages/BlogDetail'))
 const Users = lazy(() => import('../pages/users'))
 
 const routes: RouteObject[] = [
@@ -37,6 +38,14 @@ const routes: RouteObject[] = [
         element: (
           <SuspenseWrapper>
             <Blogs />
+          </SuspenseWrapper>
+        ),
+      },
+      {
+        path: 'blog/:id',
+        element: (
+          <SuspenseWrapper>
+            <BlogDetail />
           </SuspenseWrapper>
         ),
       },
